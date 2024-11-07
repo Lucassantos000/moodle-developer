@@ -1,0 +1,69 @@
+# Copyright Broadcom, Inc. All Rights Reserved.
+# SPDX-License-Identifier: APACHE-2.0
+
+services:
+  mariadb:
+    image: docker.io/bitnami/mariadb:11.4
+    environment:
+      # ALLOW_EMPTY_PASSWORD is recommended only for development.
+      # - ALLOW_EMPTY_PASSWORD=yes
+      - MARIADB_USER=bn_moodle
+      - MARIADB_PASSWORD=password
+      - MARIADB_ROOT_PASSWORD=password
+      - MARIADB_DATABASE=bitnami_moodle
+      - MARIADB_CHARACTER_SET=utf8mb4
+      - MARIADB_COLLATE=utf8mb4_unicode_ci
+    volumes:
+      - 'data_db:/bitnami/mariadb'
+
+    networks:
+      - moodle-network
+
+  moodle:
+    image: docker.io/bitnami/moodle:4.4
+    ports:
+      - '80:8080'
+      - '443:8443'
+    environment:
+      - MOODLE_DATABASE_HOST=mariadb
+      - MOODLE_DATABASE_PORT_NUMBER=3306
+      - MOODLE_DATABASE_USER=bn_moodle
+      - MOODLE_DATABASE_NAME=bitnami_moodle
+      - MOODLE_DATABASE_PASSWORD=password
+      # ALLOW_EMPTY_PASSWORD is recommended only for development.
+      # - ALLOW_EMPTY_PASSWORD=yes
+    volumes:
+      - 'moodle:/bitnami/moodle'
+      - 'moodledata:/bitnami/moodledata'
+    depends_on:
+      - mariadb
+    networks:
+      - moodle-network
+  
+  phpmyadmin:
+    image: docker.io/bitnami/phpmyadmin:5
+    ports:
+      - '8080:8080'
+    environment:
+      - PHPMYADMIN_DATABASE_HOST=mariadb
+      - PHPMYADMIN_DATABASE_PORT_NUMBER=3306
+      - PHPMYADMIN_USERNAME=bn_moodle
+      - PHPMYADMIN_PASSWORD=password
+    depends_on:
+      - mariadb
+    
+    networks:
+      - moodle-network
+      
+volumes:
+  data_db:
+    driver: local
+  moodle:
+    driver: local
+  moodledata:
+    driver: local
+
+networks:
+  moodle-network:
+    driver: bridge
+    
