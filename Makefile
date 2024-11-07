@@ -13,8 +13,14 @@ up-bitnami:
 down:
 	docker compose down
 
+down-bitnami:
+	docker compose -f docker-compose.bitnami.yml down
+
 logs:
 	docker compose logs -f
+
+logs-bitnami:
+	docker compose -f docker-compose.bitnami.yml logs -f
 
 ps:
 	docker compose ps
@@ -22,6 +28,12 @@ ps:
 build:
 	docker compose build
 
+build-bitnami:
+	docker compose -f docker-compose.bitnami.yml build
+
 restart:
 	docker compose restart
+
+restart-bitnami:
+	docker compose -f docker-compose.bitnami.yml restart
 
